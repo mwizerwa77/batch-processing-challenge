@@ -65,12 +65,12 @@ public class Tweet implements Serializable {
     @JsonProperty("filter_level")
     private String filterLevel;
 
-    @Transient
     @JsonProperty("retweeted_status")
+    @ManyToOne
     private Tweet retweetedStatus;
 
-    @Transient
     @JsonProperty("quoted_status")
+    @ManyToOne
     private Tweet quotedStatus;
 
     private String lang;
