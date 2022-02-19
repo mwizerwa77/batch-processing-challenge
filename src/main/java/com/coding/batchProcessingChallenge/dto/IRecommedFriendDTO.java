@@ -3,7 +3,7 @@
  */
 package com.coding.batchProcessingChallenge.dto;
 
-import com.coding.batchProcessingChallenge.domain.Tweet;
+import com.coding.batchProcessingChallenge.domain.User;
 
 /**
  * @author Stanley
@@ -11,14 +11,15 @@ import com.coding.batchProcessingChallenge.domain.Tweet;
  */
 public interface IRecommedFriendDTO {
 
-    Long getUserId();
+	//SELECT t.id as tweetId,t.user as userId,t.text as text,t.inReplyToUserId as replyToUserId,t.retweetedStatus as retweetId
+    User getUserId();
 
-    String getScreenName();
+    Long getReplyToUserId();
 
-    String getDescription();
+    String getText();
 
-    Tweet getQuotedStatus();
+    Long getRetweetedStatus();
 
-    Tweet getRetweetedStatus();
+    Long getTweetId();
 
 }

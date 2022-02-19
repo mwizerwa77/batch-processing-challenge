@@ -6,13 +6,22 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
 public class Tweet implements Serializable {
 
-    @JsonProperty("created_at")
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@JsonProperty("created_at")
     private String createdAt;
+
+    @JsonIgnore
+    private Date createAtTime;
 
     @Id
     private Long id;
@@ -86,6 +95,13 @@ public class Tweet implements Serializable {
     @JsonIgnore
     private String geo;
 
+    public Date getCreateAtTime() {
+        return createAtTime;
+    }
+
+    public void setCreateAtTime(Date createAtTime) {
+        this.createAtTime = createAtTime;
+    }
 
     @Override
     public String toString() {

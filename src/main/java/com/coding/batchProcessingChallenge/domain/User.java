@@ -1,18 +1,24 @@
 package com.coding.batchProcessingChallenge.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
 public class User implements Serializable {
 
-    @JsonProperty("id")
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
     private Long id;
 
     @JsonProperty("id_str")
@@ -43,6 +49,9 @@ public class User implements Serializable {
 
     @JsonProperty("created_at")
     private String createdAt;
+
+    @JsonIgnore
+    private Date createAtTime;
 
     @JsonProperty("favourites_count")
     private int favouritesCount;
@@ -123,6 +132,14 @@ public class User implements Serializable {
 
     @JsonProperty("default_profile")
     private boolean defaultProfile;
+
+    public Date getCreateAtTime() {
+        return createAtTime;
+    }
+
+    public void setCreateAtTime(Date createAtTime) {
+        this.createAtTime = createAtTime;
+    }
 
     @Override
     public String toString() {

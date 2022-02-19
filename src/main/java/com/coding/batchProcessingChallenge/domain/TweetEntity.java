@@ -12,7 +12,12 @@ import java.util.List;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
 public class TweetEntity implements Serializable {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -27,7 +32,7 @@ public class TweetEntity implements Serializable {
     private List<UserMention> userMentions;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "tweet_entity_user_mentions", joinColumns = @JoinColumn(name = "tweet_entity_id"), inverseJoinColumns = @JoinColumn(name = "user_mention_id"))
+    @JoinTable(name = "tweet_entity_symbols", joinColumns = @JoinColumn(name = "tweet_entity_id"), inverseJoinColumns = @JoinColumn(name = "symbol_id"))
     private List<TweetHashtagEntity> symbols;
 
     @ManyToMany(fetch = FetchType.LAZY)

@@ -1,29 +1,52 @@
 package com.coding.batchProcessingChallenge.service;
 
-import com.coding.batchProcessingChallenge.dto.IRecommedFriendDTO;
-import com.coding.batchProcessingChallenge.repository.ITweetRespository;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.coding.batchProcessingChallenge.domain.Tweet;
+import com.coding.batchProcessingChallenge.domain.User;
+import com.coding.batchProcessingChallenge.repository.ITweetRespository;
+import com.coding.batchProcessingChallenge.repository.IUserRespository;
 
 @Service
 public class TweetService {
 
     private ITweetRespository tweetRespository;
 
-    public String fetchRecommededFriends(Long userId, String type,String hashtag,String phrase){
-        String rcmFriends ="TeamCoolCloud,1234-0000-0001";
-        for(IRecommedFriendDTO dto:tweetRespository.fetchRecommededFriends(userId, hashtag,phrase)){
-            String contactTweetText="";
-            if(type.equalsIgnoreCase("retweet")){
-                contactTweetText = dto.getRetweetedStatus().getText();
-            }else  if(type.equalsIgnoreCase("reply")){
-                contactTweetText = dto.getQuotedStatus().getText();
-            }else{
-                contactTweetText = dto.getRetweetedStatus().getText()+" "+dto.getQuotedStatus().getText();
-            }
-            String item =dto.getUserId()+"\t"+dto.getScreenName()+"\t"+dto.getDescription()+"\t"+contactTweetText;
-            rcmFriends = rcmFriends+"\n"+item;
-        }
+    @Autowired
+    private IUserRespository userRespository;
 
-        return rcmFriends;
+  
+    /*public List<IRecommedFriendDTO> fetchRecommededFriends(Long userId){
+         List<IRecommedFriendDTO> iRecommedFriendDTOS = new ArrayList<>();
+        try {
+            Optional<User> user = userRespository.findById(userId);
+            if(!user.isPresent()){
+                throw new NullPointerException("User not found");
+            }
+            iRecommedFriendDTOS = tweetRespository.fetchRecommededFriends(user.get().getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return iRecommedFriendDTOS;
+    }*/
+
+
+    public String fetchRecommededFriendsWithSupportedLanguage(Long userId, String type, String hashtag, String phrase, List<String> list) {
+
+        return null;
     }
+
+	public Iterable<User> findAll() {
+		return userRespository.findAll();
+	}
+
+	/*public Long findAllTweets() {
+		
+		Long id = Long.parseLong("451954866139590656");
+		
+		return tweetRespository.findTweetById(id).get();
+	}*/
 }

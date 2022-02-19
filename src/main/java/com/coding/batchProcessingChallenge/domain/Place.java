@@ -1,6 +1,5 @@
 package com.coding.batchProcessingChallenge.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -14,7 +13,12 @@ import java.io.Serializable;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
 public class Place implements Serializable {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long refId;
 

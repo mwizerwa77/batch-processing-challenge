@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TweetWriter implements ItemWriter<Tweet>, StepExecutionListener {
+public class TweetWriter implements ItemWriter<Tweet> {
 
     @Autowired
     private IUserRespository userRespository;
@@ -47,8 +47,6 @@ public class TweetWriter implements ItemWriter<Tweet>, StepExecutionListener {
     @Autowired
     private IGeometryRespository geometryRespository;
 
-    private StepExecution stepExecution;
-
     User user;
 
     Place place;
@@ -69,6 +67,75 @@ public class TweetWriter implements ItemWriter<Tweet>, StepExecutionListener {
     public void write(List<? extends Tweet> items) throws Exception {
 
         for (Tweet item : items) {
+        	if(item.getRetweetedStatus()!=null) {
+        		//save user
+        		Tweet retweet = item.getRetweetedStatus();
+        		
+               User user = retweet.getUser();
+                if (user != null) {
+                    System.out.println("***************Saving user*********************");
+                    dbWriteUser(user);
+                }else{
+                    System.out.println("***************saving user failed***********");
+                }
+
+                //save place
+                if (retweet.getPlace() != null) {
+                    System.out.println("***************Saving place*********************");
+                    Place  place  = retweet.getPlace();
+                    dbWritePlace(place);
+                }else{
+                    System.out.println("***************saving place failed***********");
+                }
+                
+                //save geo
+                if (retweet.getCoordinates() != null) {
+                Geometry coordinates = retweet.getCoordinates();
+                    
+                    System.out.println("***************Saving Geometry*********************");
+                    dbWriteGeometry(coordinates);
+                }else{
+                    System.out.println("***************saving Geometry failed***********");
+                }
+                //prepare tweet Entity
+                TweetEntity entities = retweet.getEntities();
+                if (retweet.getEntities().getTweetHashtags().size() > 0) {
+                	
+                    //set tweet hash tags
+                   List<TweetHashtagEntity> validHashtags = entities.getTweetHashtags();
+                    
+                    System.out.println("***************Saving hastags*********************");
+                    dbWriteHashTags(validHashtags);
+                }else{
+                    System.out.println("***************saving hashtags failed***********");
+                }
+
+                //set sumbols
+                List<TweetHashtagEntity> validSymbols = entities.getSymbols();
+
+                //set user mentions
+                List<UserMention> userMentions = entities.getUserMentions();
+                if (userMentions.size() > 0) {
+                    System.out.println("***************Saving usermentions*********************");
+                    dbWriteUserMentions(userMentions);
+                }else{
+                    System.out.println("***************saving usermentions failed***********");
+                }
+                //set urls
+                List<UrlEntity> urls = entities.getUrls();
+                if (urls.size() > 0) {
+                    System.out.println("***************Saving urls*********************");
+                    dbWriteUrls(urls);
+                }else{
+                    System.out.println("***************saving urls failed***********");
+                }
+
+                System.out.println("***************Saving tweet entities*********************");
+                dbWriteTweetEntity(entities);
+
+                System.out.println("***************Saving tweet*********************");
+                dbWriteTweet(retweet);
+            }
             //save user
             user = item.getUser();
             if (user != null) {
@@ -85,6 +152,7 @@ public class TweetWriter implements ItemWriter<Tweet>, StepExecutionListener {
             }else{
                 System.out.println("***************saving place failed***********");
             }
+            
             //save geo
             coordinates = item.getCoordinates();
             if (coordinates != null) {
@@ -132,27 +200,14 @@ public class TweetWriter implements ItemWriter<Tweet>, StepExecutionListener {
                 System.out.println("***************saving tweet entities failed***********");
             }
 
-            if (item != null) {
-                System.out.println("***************Saving tweet*********************");
-                dbWriteTweet(item);
-            }else{
-                System.out.println("***************saving twee failed***********");
-            }
+            System.out.println("***************Saving tweet*********************");
+            dbWriteTweet(item);
         }
 
         System.out.println("Saving tweets to db");
     }
 
-    @Override
-    public void beforeStep(StepExecution stepExecution) {
-        this.stepExecution = stepExecution;
-    }
-
-    @Override
-    public ExitStatus afterStep(StepExecution stepExecution) {
-
-        return null;
-    }
+    
 
     private void writeUser(User person, ExecutionContext executionContext) throws Exception {
         JsonFileItemWriter<User> itemWriter = new JsonFileItemWriter<>(new FileSystemResource("output/user.json"), new JacksonJsonObjectMarshaller<>());
