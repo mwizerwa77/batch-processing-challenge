@@ -11,15 +11,18 @@ import com.coding.batchProcessingChallenge.domain.User;
  */
 public interface IRecommedFriendDTO {
 
-	//SELECT t.id as tweetId,t.user as userId,t.text as text,t.inReplyToUserId as replyToUserId,t.retweetedStatus as retweetId
-    User getUserId();
+	// SELECT t.id as tweetId,t.user as userId,t.text as text,t.inReplyToUserId as
+	// replyToUserId,t.retweetedStatus as retweetId
+	User getUserId();
 
-    Long getReplyToUserId();
+	Long getReplyToUserId();
 
-    String getText();
+	String getText();
 
-    Long getRetweetedStatus();
+	Long getRetweetedStatus();
 
-    Long getTweetId();
+	Long getRetweetedToUserId();
+
+	Long getTweetId();
 
 }
