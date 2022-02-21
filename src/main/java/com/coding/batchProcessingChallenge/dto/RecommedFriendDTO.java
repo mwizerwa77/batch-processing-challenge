@@ -1,10 +1,8 @@
 package com.coding.batchProcessingChallenge.dto;
 
-public class RecommedFriendDTO {
+public class RecommedFriendDTO  implements Comparable{
 
 	private long userId;
-
-    private long retweetToUserId;
 
     private String text;
 
@@ -16,6 +14,20 @@ public class RecommedFriendDTO {
 
 	private Long tweetId;
     
+	private int hashtagCount;
+	
+	private double hashtagScore;
+
+	private int replyCount;
+
+	private int retweetCount;
+	
+	private double interactionScore;
+	
+	private int keywordCount;
+
+	private double keywordScore;
+	
     private double score;
 
 	public long getUserId() {
@@ -24,14 +36,6 @@ public class RecommedFriendDTO {
 
 	public void setUserId(long userId) {
 		this.userId = userId;
-	}
-
-	public long getRetweetToUserId() {
-		return retweetToUserId;
-	}
-
-	public void setRetweetToUserId(long retweetToUserId) {
-		this.retweetToUserId = retweetToUserId;
 	}
 
 	public String getText() {
@@ -81,5 +85,70 @@ public class RecommedFriendDTO {
 	public void setScore(double score) {
 		this.score = score;
 	}
-    
+
+	public int getHashtagCount() {
+		return hashtagCount;
+	}
+
+	public void setHashtagCount(int hashtagCount) {
+		this.hashtagCount = hashtagCount;
+	}
+
+	public double getHashtagScore() {
+		return hashtagScore;
+	}
+
+	public void setHashtagScore(double hashtagScore) {
+		this.hashtagScore = hashtagScore;
+	}
+
+	public int getReplyCount() {
+		return replyCount;
+	}
+
+	public void setReplyCount(int replyCount) {
+		this.replyCount = replyCount;
+	}
+
+	public int getRetweetCount() {
+		return retweetCount;
+	}
+
+	public void setRetweetCount(int retweetCount) {
+		this.retweetCount = retweetCount;
+	}
+
+	public double getInteractionScore() {
+		return interactionScore;
+	}
+
+	public void setInteractionScore(double interactionScore) {
+		this.interactionScore = interactionScore;
+	}
+
+	public int getKeywordCount() {
+		return keywordCount;
+	}
+
+	public void setKeywordCount(int keywordCount) {
+		this.keywordCount = keywordCount;
+	}
+
+	public double getKeywordScore() {
+		return keywordScore;
+	}
+
+	public void setKeywordScore(double keywordScore) {
+		this.keywordScore = keywordScore;
+	}
+	
+	@Override
+    public int compareTo(Object comparestu) {
+        int compareage=(int) ((RecommedFriendDTO)comparestu).getScore();
+       
+        /* For Descending order */
+        return (int) (compareage-this.score);
+    }
+
+	
 }
