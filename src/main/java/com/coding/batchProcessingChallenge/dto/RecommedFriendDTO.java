@@ -29,6 +29,26 @@ public class RecommedFriendDTO  implements Comparable{
 	private double keywordScore;
 	
     private double score;
+    
+    
+
+	public RecommedFriendDTO(long userId, String text, Long replyToUserId, Long retweetedStatus, Long retweetedToUserId,
+			Long tweetId, int replyCount, int retweetCount, int keywordCount) {
+		super();
+		this.userId = userId;
+		this.text = text;
+		this.replyToUserId = replyToUserId;
+		this.retweetedStatus = retweetedStatus;
+		this.retweetedToUserId = retweetedToUserId;
+		this.tweetId = tweetId;
+		this.replyCount = replyCount;
+		this.retweetCount = retweetCount;
+		this.keywordCount = keywordCount;
+	}
+
+	public RecommedFriendDTO() {
+		super();
+	}
 
 	public long getUserId() {
 		return userId;

@@ -1,11 +1,5 @@
 package com.coding.batchProcessingChallenge.config;
 
-import com.coding.batchProcessingChallenge.Listener.TweetSkipListener;
-import com.coding.batchProcessingChallenge.domain.Tweet;
-import com.coding.batchProcessingChallenge.domain.User;
-import com.coding.batchProcessingChallenge.processor.TweetProcessor;
-import com.coding.batchProcessingChallenge.writer.TweetWriter;
-import com.fasterxml.jackson.core.JsonParseException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -13,8 +7,6 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.integration.async.AsyncItemProcessor;
-import org.springframework.batch.integration.async.AsyncItemWriter;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.JsonItemReader;
@@ -23,8 +15,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import com.coding.batchProcessingChallenge.Listener.TweetSkipListener;
+import com.coding.batchProcessingChallenge.domain.Tweet;
+import com.coding.batchProcessingChallenge.processor.TweetProcessor;
+import com.coding.batchProcessingChallenge.writer.TweetWriter;
+import com.fasterxml.jackson.core.JsonParseException;
 
 @EnableBatchProcessing
 @Configuration
@@ -38,7 +35,7 @@ public class BatchProcessingHandler {
 
     final Integer skipLimit = 10000;
 
-    final Integer chunkSize = 2;
+    final Integer chunkSize = 3;
 
     @Value("${input.tweet.file}")
     private String inputFile;
@@ -46,9 +43,9 @@ public class BatchProcessingHandler {
 
     @StepScope
     @Bean
-    public JsonItemReader jsonItemReader() {
+    public JsonItemReader<Tweet> jsonItemReader() {
 
-        JsonItemReader reader = new JsonItemReader(new FileSystemResource(inputFile), new JacksonJsonObjectReader(Tweet.class));
+        JsonItemReader<Tweet> reader = new JsonItemReader<Tweet>(new FileSystemResource(inputFile), new JacksonJsonObjectReader<Tweet>(Tweet.class));
 
         return reader;
     }
@@ -57,11 +54,11 @@ public class BatchProcessingHandler {
 
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setCorePoolSize(1);
-        taskExecutor.setMaxPoolSize(2);
+        taskExecutor.setMaxPoolSize(1);
         taskExecutor.afterPropertiesSet();
 
         return steps.get("step1")
-                .<Integer, User>chunk(chunkSize)
+                .<Tweet, Tweet>chunk(chunkSize)
                 .reader(jsonItemReader())
                 .processor(processor())
                 .writer(writer())
@@ -85,6 +82,7 @@ public class BatchProcessingHandler {
     @Bean
     public Job tweetJob() {
         return jobs.get("tweetJob")
+        		
                 .incrementer(new RunIdIncrementer())
                .start(step1())
                 .build();

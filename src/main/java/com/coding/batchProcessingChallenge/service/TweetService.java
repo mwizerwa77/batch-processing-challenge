@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.coding.batchProcessingChallenge.domain.User;
-import com.coding.batchProcessingChallenge.dto.HashtagCountDTO;
+import com.coding.batchProcessingChallenge.dto.IHashtagCountDTO;
+import com.coding.batchProcessingChallenge.dto.IRecommendFriendDTO;
 import com.coding.batchProcessingChallenge.dto.RecommedFriendDTO;
 import com.coding.batchProcessingChallenge.repository.ITweetRespository;
 import com.coding.batchProcessingChallenge.repository.IUserRespository;
@@ -26,29 +27,22 @@ public class TweetService {
 
 		Optional<User> user = userRespository.findById(userId);
 
-		if (!user.isPresent()) {
-			return "User not found";
+		if (user.isPresent()) {
+			return tweetRespository.recommendFriends(user.get(), userId, hashtag, phrase).size()+"";
 		}
-
 
 		List<RecommedFriendDTO> recommendFriendsList = new ArrayList<RecommedFriendDTO>();
 		
-		Iterable<RecommedFriendDTO> recommendFriends = null;
-		
 		try {
-			recommendFriends = tweetRespository.recommendFriends(user.get(), userId, hashtag,
-					phrase);
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-		}
+			List<IRecommendFriendDTO> recommendFriends = tweetRespository.recommendFriends(user.get(), userId, hashtag, phrase);
 
-		if(recommendFriends !=null) {
 			recommendFriends.forEach(item ->{
 
+				RecommedFriendDTO entity = new RecommedFriendDTO(item.getUserId().getId(), item.getText(), item.getReplyToUserId(), item.getRetweetedStatus(), item.getRetweetedToUserId(), item.getTweetId(), item.getReplyCount(), item.getRetweetCount(), item.getKeywordCount());
+				
 				// calculate interaction score
 				double interactionScore = Math.log(1 + (item.getReplyCount() * 2) + item.getRetweetCount());
-				item.setInteractionScore(interactionScore);
+				entity.setInteractionScore(interactionScore);
 
 				// calculate keyword count
 				double keywordScore;
@@ -57,14 +51,14 @@ public class TweetService {
 				} else {
 					keywordScore = 0;
 				}
-				item.setKeywordScore(keywordScore);
+				entity.setKeywordScore(keywordScore);
 
 				// calculate hashtag count
-				List<HashtagCountDTO> hashtagCounts = tweetRespository.getHashtagCount(user.get(), userId);
+				List<IHashtagCountDTO> hashtagCounts = tweetRespository.getHashtagCount(user.get(), userId);
 
 				hashtagCounts.forEach(hashtagCount -> {
 
-					if (hashtagCount.getUserId().getId() == item.getUserId()
+					if (hashtagCount.getUserId().getId() == item.getUserId().getId()
 							&& (hashtagCount.getReplyToUserId() == item.getReplyToUserId()
 									|| hashtagCount.getRetweetedToUserId() == item.getRetweetedToUserId())) {
 						double hashtagScore;
@@ -74,8 +68,8 @@ public class TweetService {
 							hashtagScore = 1;
 						}
 
-						item.setHashtagCount(hashtagCount.getHashtagCount());
-						item.setHashtagScore(hashtagScore);
+						entity.setHashtagCount(hashtagCount.getHashtagCount());
+						entity.setHashtagScore(hashtagScore);
 
 						hashtagCounts.remove(hashtagCount);
 						return;
@@ -84,20 +78,28 @@ public class TweetService {
 				});
 
 				// calculate total score
-				double score = item.getInteractionScore() * item.getHashtagScore() * item.getKeywordScore();
-				item.setScore(score);
-				recommendFriendsList.add(item);
+				double score = entity.getInteractionScore() * entity.getHashtagScore() * entity.getKeywordScore();
+				entity.setScore(score);
+				recommendFriendsList.add(entity);
 			});
 			
 			
 			return processResponseText(userId, recommendFriendsList);
+		
+			//recommendFriends = ;
+		} catch (Exception e) {
+			
+			e.printStackTrace();
 		}
-		
-		
 		return "No recommended friends found";
 		
 	}
+	
+	public List<IRecommendFriendDTO> getFriends(User user, String type, String phrase, String hashtag) {
+		return tweetRespository.recommendFriends(user, user.getId(), hashtag, phrase);
+	}
 
+	@SuppressWarnings("unchecked")
 	private String processResponseText(Long userId, List<RecommedFriendDTO> recommendFriends) {
 		
 		//sort items by score value
